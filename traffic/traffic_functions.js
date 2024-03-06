@@ -9,7 +9,6 @@ async function startTrafficMenu(message, bot){
 	})
 	
 }
-///////////////////////////////////////////
 
 
 
@@ -20,16 +19,36 @@ async function handleChosenTraffic(message,bot){
 			remove_keyboard: true
 		}
 	})
-	setTimeout(async ()=>{
-		await  bot.sendMessage(message.chat.id, "тариф активирован")
+	return new Promise((resolve, reject)=>{
 		setTimeout(async ()=>{
-			await  bot.sendMessage(message.chat.id, "Спасибо")
-			await bot.sendPhoto(message.chat.id, "./public/livsi.jpg")
+			await  bot.sendMessage(message.chat.id, "тариф активирован")
+			setTimeout(async ()=>{
+				await  bot.sendMessage(message.chat.id, "Спасибо")
+				await bot.sendPhoto(message.chat.id, "./public/livsi.jpg")
+				resolve()
+			}, 5000)
 		}, 5000)
-	}, 5000)
 
+
+	})
 }
 
-export {startTrafficMenu, handleChosenTraffic}
+
+async function handleTryForFree(message, bot){
+	return new Promise((resolve, reject)=>{
+		setTimeout(async()=>{
+			await bot.sendMessage(message.chat.id, "Спасибо", {
+				reply_markup: {
+					remove_keyboard: true
+				}
+			})
+			await bot.sendPhoto(message.chat.id, "./public/hi.jpg")
+			resolve()
+		}, 8000)
+	})
+}
+
+
+export {startTrafficMenu, handleChosenTraffic, handleTryForFree}
 
 

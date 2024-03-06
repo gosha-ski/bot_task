@@ -1,15 +1,17 @@
 import TelegramBot from 'node-telegram-bot-api';	
 import {start, isInGreetWaiters, deleteFromGreetWaiters, handleGreetWaiters} from "./greeting/greet_functions.js"
 import {deleteFromStates, handleStates} from "./state/state_functions.js"
-import {startTrafficMenu, handleChosenTraffic} from "./traffic/traffic_functions.js"
+import {startTrafficMenu, handleChosenTraffic, handleTryForFree} from "./traffic/traffic_functions.js"
 import {startMenu} from "./start_menu.js"
+import {isInQueue, deleteFromQueue} from "./queue/queue_functions.js"
 
 
 const bot = new TelegramBot("7101711750:AAGMJlsN8g7jhU2teBwyhCROORqwpnMQUP8", {
-
     polling: true
-    
 });
+
+let queue = []
+//{user_id: , chat_id: , notifications: number, dateStart: number}
 
 let states = []
 //{user_id: , chat_id: , notifications: number, dateStart: number}
@@ -34,7 +36,14 @@ bot.on("text", async(message)=>{
 		states.push({user_id: message.from.id, chat_id: message.chat.id, notifications: 0, dateStart: message.date})
 	}else if(message.text == "try for free"){
 		deleteFromStates(message, states)
-		await handleTryForFree(message, bot)
+		if(isInQueue(queue, message)){
+			await bot.sendMessage(message.chat.id, "Подождите, ваш запрос обрабатывается")
+		}else{
+			queue.push({user_id: message.from.id, chat_id: message.chat.id, notifications: 0,  dateStart: message.date})
+			await handleTryForFree(message, bot)
+			deleteFromQueue(queue, message)
+		}
+		//await handleTryForFree(message, bot)
 	}
 	else if(message.text == "choose traffic"){
 		deleteFromStates(message, states)
@@ -44,7 +53,17 @@ bot.on("text", async(message)=>{
 	}
 	else if(message.text == "basics" || message.text == "custom" || message.text == "pro"){
 		deleteFromStates(message, states)
-		await handleChosenTraffic(message, bot)
+		//console.log(queue)
+		//console.log(isInQueue(queue, message))
+		if(isInQueue(queue, message)){
+			await bot.sendMessage(message.chat.id, "Подождите, ваш запрос обрабатывается")
+		}else{
+			queue.push({user_id: message.from.id, chat_id: message.chat.id, notifications: 0,  dateStart: message.date})
+			console.log("user not in queue", queue)
+			await handleChosenTraffic(message, bot)
+			deleteFromQueue(queue, message)
+			//console.log(res)
+		}
 
 	}
 	else{
@@ -70,20 +89,3 @@ bot.on("text", async(message)=>{
 handleGreetWaiters(greetWaiters, bot)
 handleStates(states, bot)
 
-
-async function handleTryForFree(message, bot){
-	setTimeout(async()=>{
-		await bot.sendMessage(message.chat.id, "Спасибо", {
-			reply_markup: {
-				remove_keyboard: true
-			}
-		})
-		await bot.sendPhoto(message.chat.id, "./public/hi.jpg")
-	}, 10000)
-}
-
-
-
-setInterval(()=>{
-	console.log(states)
-},2000)
