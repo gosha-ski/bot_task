@@ -1,6 +1,7 @@
 async function start( greetWaiters,message, bot){
 	await bot.sendMessage(message.chat.id, "hello")
-	greetWaiters.push({user_id: message.from.id, chat_id: message.chat.id, notifications:0})
+	await bot.sendPhoto(message.chat.id, "./public/hi.jpg")
+	greetWaiters.push({user_id: message.from.id, chat_id: message.chat.id, notifications:0, dateStart: message.date})
 
 }
 
@@ -8,10 +9,12 @@ function handleGreetWaiters(greetWaiters, bot){
 	setInterval(()=>{
 		for(let i=0; i<greetWaiters.length; i++){
 			let elem = greetWaiters[i]
-			if(elem.notifications >=1){
+			let now = Math.ceil((new Date()).getTime()/1000)+7203
+			let difference = now - elem.dateStart
+			if(difference>=20){
 				bot.sendMessage(elem.chat_id, "Хорошо увидимся позже")
 				greetWaiters.splice(i,1)
-			}else{
+			}else if(difference>=8 && elem.notifications==0){
 				bot.sendMessage(elem.chat_id, "Поприветсвуй меня")
 				elem.notifications++
 			}

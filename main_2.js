@@ -12,10 +12,10 @@ const bot = new TelegramBot("6991126027:AAG1g5gzl5U5wDRhe95hZfeGJrhU-P0Z5ug", {
 });
 
 let states = []
-//{user_id: , chat_id: , notifications: number}
+//{user_id: , chat_id: , notifications: number, dateStart: number}
 
 let greetWaiters = []
-//{user_id: , chat_id: , notifications: number}
+//{user_id: , chat_id: , notifications: number, dateStart: number}
 
 let commands = [
 	{command: "start", description: "запуск бота"},
@@ -25,12 +25,13 @@ bot.setMyCommands(commands)
 
 
 bot.on("text", async(message)=>{
+	//console.log(message)
 	if(message.text == "/start"){
 		await start(greetWaiters ,message, bot)
 
 	}else if(message.text == "/menu"){
 		await startMenu(message, bot)
-		states.push({user_id: message.from.id, chat_id: message.chat.id, notifications: 0})
+		states.push({user_id: message.from.id, chat_id: message.chat.id, notifications: 0, dateStart: message.date})
 	}else if(message.text == "try for free"){
 		deleteFromStates(message, states)
 		await handleTryForFree(message, bot)
@@ -38,7 +39,7 @@ bot.on("text", async(message)=>{
 	else if(message.text == "choose traffic"){
 		deleteFromStates(message, states)
 		await startTrafficMenu(message, bot)
-		states.push({user_id: message.from.id, chat_id: message.chat.id, notifications: 0})
+		states.push({user_id: message.from.id, chat_id: message.chat.id, notifications: 0,  dateStart: message.date})
 
 	}
 	else if(message.text == "basics" || message.text == "custom" || message.text == "pro"){
@@ -49,9 +50,14 @@ bot.on("text", async(message)=>{
 	else{
 		console.log("else")
 		if(isInGreetWaiters(greetWaiters, message, bot)){
+			if(message.text=="Привет" || message.text=="привет"){
+				await bot.sendMessage(message.chat.id, "Приступим")
+			}else{
+				await bot.sendMessage(message.chat.id, "Странное приветствие) но продолжим")
+			}
 			
 			await startMenu(message, bot)
-			states.push({user_id: message.from.id, chat_id: message.chat.id, notifications: 0})
+			states.push({user_id: message.from.id, chat_id: message.chat.id, notifications: 0, dateStart: message.date})
 			deleteFromGreetWaiters(greetWaiters,message)
 		}else{
 			await bot.sendMessage(message.chat.id, "Нет результатов")
@@ -67,7 +73,11 @@ handleStates(states, bot)
 
 async function handleTryForFree(message, bot){
 	setTimeout(async()=>{
-		await bot.sendMessage(message.chat.id, "Спасибо")
+		await bot.sendMessage(message.chat.id, "Спасибо", {
+			reply_markup: {
+				remove_keyboard: true
+			}
+		})
 		await bot.sendPhoto(message.chat.id, "./public/hi.jpg")
 	}, 10000)
 }

@@ -1,5 +1,4 @@
 
-
 async function startTrafficMenu(message, bot){
 	await bot.sendMessage(message.chat.id, "Выберите трафик", {
 		reply_markup: {
