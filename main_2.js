@@ -5,7 +5,7 @@ import {startTrafficMenu, handleChosenTraffic} from "./traffic/traffic_functions
 import {startMenu} from "./start_menu.js"
 
 
-const bot = new TelegramBot("6991126027:AAG1g5gzl5U5wDRhe95hZfeGJrhU-P0Z5ug", {
+const bot = new TelegramBot("7101711750:AAGMJlsN8g7jhU2teBwyhCROORqwpnMQUP8", {
 
     polling: true
     
